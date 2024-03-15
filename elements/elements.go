@@ -35,3 +35,9 @@ type ObjectPair struct {
 }
 
 func (o *Object) element() {}
+
+type Array struct {
+	Elements []Element
+}
+
+func (a *Array) element() {}

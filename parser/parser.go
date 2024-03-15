@@ -27,7 +27,7 @@ func NewParser(l *lexer.Lexer) *Parser {
 // Parses the grammar found at https://www.json.org/json-en.html
 func (p *Parser) Parse() error {
 	_, err := p.parseElement()
-	if !p.lexer.Done() {
+	if err == nil && !p.lexer.Done() {
 		return errors.New("dangling elements found")
 	}
 	return err
@@ -42,6 +42,8 @@ func (p *Parser) parseElement() (elements.Element, error) {
 	switch p.currentToken.Type {
 	case tokens.LBRACE:
 		return p.parseObject()
+	case tokens.LBRACKET:
+		return p.parseArray()
 	case tokens.STRING:
 		return p.parseString()
 	case tokens.NUMBER:
@@ -53,7 +55,7 @@ func (p *Parser) parseElement() (elements.Element, error) {
 	case tokens.NULL:
 		return p.parseKeyword()
 	default:
-		return nil, fmt.Errorf("unsupported token %q", p.currentToken.Literal)
+		return nil, fmt.Errorf("illegal token %q", p.currentToken.Literal)
 	}
 }
 
@@ -90,6 +92,32 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 	}
 
 	return nil, fmt.Errorf("expected %q, found %q", tokens.LBRACE, p.currentToken.Literal)
+}
+
+func (p *Parser) parseArray() (*elements.Array, error) {
+	arr := &elements.Array{}
+
+	p.nextToken()
+	for p.currentToken.Type != tokens.RBRACKET && p.currentToken.Type != tokens.EOF {
+		element, err := p.parseElement()
+		if err != nil {
+			return nil, err
+		}
+
+		arr.Elements = append(arr.Elements, element)
+		p.nextToken()
+		fmt.Println(p.currentToken)
+
+		if p.currentToken.Type == tokens.COMMA {
+			p.nextToken()
+		}
+	}
+
+	if p.currentToken.Type != tokens.RBRACKET {
+		return nil, fmt.Errorf("expected %q, found %q", tokens.RBRACKET, p.currentToken.Literal)
+	}
+
+	return arr, nil
 }
 
 func (p *Parser) parseString() (*elements.String, error) {

@@ -55,6 +55,10 @@ func (l *Lexer) scanNextToken() tokens.Token {
 		tok = tokens.NewToken(tokens.LBRACE, string(l.char))
 	case '}':
 		tok = tokens.NewToken(tokens.RBRACE, string(l.char))
+	case '[':
+		tok = tokens.NewToken(tokens.LBRACKET, string(l.char))
+	case ']':
+		tok = tokens.NewToken(tokens.RBRACKET, string(l.char))
 	case ':':
 		tok = tokens.NewToken(tokens.COLON, string(l.char))
 	case ',':
@@ -68,6 +72,9 @@ func (l *Lexer) scanNextToken() tokens.Token {
 		if isLetter(l.char) {
 			tok.Literal = l.scanKeyword()
 			tok.Type = tokens.LookupKeyword(tok.Literal)
+			// Return to prevent a readCharacter() call since scanKeyword() stops
+			// at the following character
+			return tok
 		} else if isDigit(l.char) {
 			num, err := l.scanNumber()
 			if err != nil {
@@ -76,6 +83,9 @@ func (l *Lexer) scanNextToken() tokens.Token {
 				tok.Type = tokens.NUMBER
 				tok.Literal = num
 			}
+			// Return to prevent a readCharacter() call since scanNumber() stops
+			// at the following character
+			return tok
 		} else {
 			tok = tokens.NewToken(tokens.ILLEGAL, string(l.char))
 		}
