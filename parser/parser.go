@@ -37,6 +37,12 @@ func (p *Parser) parseElement() (elements.Element, error) {
 		return p.parseObject()
 	case tokens.STRING:
 		return p.parseString()
+	case tokens.TRUE:
+		fallthrough
+	case tokens.FALSE:
+		fallthrough
+	case tokens.NULL:
+		return p.parseKeyword()
 	default:
 		return nil, fmt.Errorf("unsupported token %q", p.currentToken.Literal)
 	}
@@ -79,4 +85,9 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 
 func (p *Parser) parseString() (*elements.String, error) {
 	return &elements.String{Value: p.currentToken}, nil
+}
+
+func (p *Parser) parseKeyword() (*elements.Keyword, error) {
+	return &elements.Keyword{Value: p.currentToken}, nil
+
 }

@@ -12,6 +12,12 @@ type String struct {
 
 func (o *String) element() {}
 
+type Keyword struct {
+	Value tokens.Token
+}
+
+func (o *Keyword) element() {}
+
 type Object struct {
 	Pairs []*ObjectPair
 }

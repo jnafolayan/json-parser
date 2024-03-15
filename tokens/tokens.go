@@ -29,3 +29,16 @@ const (
 	FALSE = "FALSE"
 	NULL  = "NULL"
 )
+
+var keywords = map[string]TokenType{
+	"true":  TRUE,
+	"false": FALSE,
+	"null":  NULL,
+}
+
+func LookupKeyword(keyword string) TokenType {
+	if tt, ok := keywords[keyword]; ok {
+		return tt
+	}
+	return ILLEGAL
+}

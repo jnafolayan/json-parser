@@ -15,3 +15,13 @@ func (l *Lexer) scanString() string {
 
 	return res.String()
 }
+
+func (l *Lexer) scanKeyword() string {
+	var res strings.Builder
+	for isLetter(l.char) {
+		res.WriteByte(l.char)
+		l.readCharacter()
+	}
+
+	return res.String()
+}

@@ -57,13 +57,16 @@ func (l *Lexer) scanNextToken() tokens.Token {
 		tok = tokens.NewToken(tokens.COMMA, string(l.char))
 	case 0:
 		tok = tokens.NewToken(tokens.EOF, "")
+	case '"':
+		// Scan a string
+		tok = tokens.NewToken(tokens.STRING, l.scanString())
 	default:
-		if l.char == '"' {
-			// Scan a string
-			tok = tokens.NewToken(tokens.STRING, l.scanString())
-			break
+		if isLetter(l.char) {
+			tok.Literal = l.scanKeyword()
+			tok.Type = tokens.LookupKeyword(tok.Literal)
+		} else {
+			tok = tokens.NewToken(tokens.ILLEGAL, string(l.char))
 		}
-		tok = tokens.NewToken(tokens.ILLEGAL, string(l.char))
 	}
 
 	l.readCharacter()
@@ -80,6 +83,10 @@ func (l *Lexer) skipWhitespace() {
 func isWhitespace(b byte) bool {
 	// https://www.json.org/json-en.html
 	return b == '\u0020' || b == '\u000a' || b == '\u000d' || b == '\u0009'
+}
+
+func isLetter(ch byte) bool {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'
 }
 
 // scanNextLine scans the next line from the source. Returns false if an error occured,
