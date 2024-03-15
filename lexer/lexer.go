@@ -63,9 +63,14 @@ func (l *Lexer) parseNextToken() tokens.Token {
 }
 
 func (l *Lexer) skipWhitespace() {
-	for l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' {
+	for isWhitespace(l.char) {
 		l.readCharacter()
 	}
+}
+
+func isWhitespace(b byte) bool {
+	// https://www.json.org/json-en.html
+	return b == '\u0020' || b == '\u000a' || b == '\u000d' || b == '\u0009'
 }
 
 // scanNextLine scans the next line from the source. Returns false if an error occured,
