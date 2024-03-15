@@ -3,6 +3,9 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"math"
+	"strconv"
+	"strings"
 
 	"github.com/jnafolayan/json-parser/elements"
 	"github.com/jnafolayan/json-parser/lexer"
@@ -41,6 +44,8 @@ func (p *Parser) parseElement() (elements.Element, error) {
 		return p.parseObject()
 	case tokens.STRING:
 		return p.parseString()
+	case tokens.NUMBER:
+		return p.parseNumber()
 	case tokens.TRUE:
 		fallthrough
 	case tokens.FALSE:
@@ -89,6 +94,25 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 
 func (p *Parser) parseString() (*elements.String, error) {
 	return &elements.String{Value: p.currentToken}, nil
+}
+
+func (p *Parser) parseNumber() (*elements.Number, error) {
+	parts := strings.Split(p.currentToken.Literal, "e")
+	i, err := strconv.ParseFloat(parts[0], 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid number %s: %w", p.currentToken.Literal, err)
+	}
+
+	if len(parts) == 2 {
+		i2, err := strconv.ParseFloat(parts[1], 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid number %s: %w", p.currentToken.Literal, err)
+		}
+
+		i = i * math.Pow(10, i2)
+	}
+
+	return &elements.Number{Token: p.currentToken, Value: i}, nil
 }
 
 func (p *Parser) parseKeyword() (*elements.Keyword, error) {

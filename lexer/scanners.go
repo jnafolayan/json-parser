@@ -45,7 +45,7 @@ func (l *Lexer) scanNumber() (string, error) {
 	}
 
 	if l.char == 'E' || l.char == 'e' {
-		number.WriteByte(l.char)
+		number.WriteByte('e')
 		l.readCharacter()
 		if l.char == '+' || l.char == '-' {
 			number.WriteByte(l.char)

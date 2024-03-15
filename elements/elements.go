@@ -10,13 +10,20 @@ type String struct {
 	Value tokens.Token
 }
 
-func (o *String) element() {}
+func (s *String) element() {}
+
+type Number struct {
+	Token tokens.Token
+	Value float64
+}
+
+func (n *Number) element() {}
 
 type Keyword struct {
 	Value tokens.Token
 }
 
-func (o *Keyword) element() {}
+func (k *Keyword) element() {}
 
 type Object struct {
 	Pairs []*ObjectPair
