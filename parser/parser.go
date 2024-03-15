@@ -35,6 +35,8 @@ func (p *Parser) parseElement() (elements.Element, error) {
 	switch p.currentToken.Type {
 	case tokens.LBRACE:
 		return p.parseObject()
+	case tokens.STRING:
+		return p.parseString()
 	default:
 		return nil, fmt.Errorf("unsupported token %q", p.currentToken.Literal)
 	}
@@ -62,6 +64,7 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 			Value: element,
 		})
 
+		p.nextToken()
 		if p.currentToken.Type == tokens.COMMA {
 			p.nextToken()
 		}
@@ -72,4 +75,8 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 	}
 
 	return nil, fmt.Errorf("expected %q, found %q", tokens.LBRACE, p.currentToken.Literal)
+}
+
+func (p *Parser) parseString() (*elements.String, error) {
+	return &elements.String{Value: p.currentToken}, nil
 }

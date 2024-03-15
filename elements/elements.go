@@ -6,6 +6,12 @@ type Element interface {
 	element()
 }
 
+type String struct {
+	Value tokens.Token
+}
+
+func (o *String) element() {}
+
 type Object struct {
 	Pairs []*ObjectPair
 }
