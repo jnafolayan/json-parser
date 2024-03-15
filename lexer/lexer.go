@@ -39,11 +39,11 @@ func FromString(input string) *Lexer {
 func (l *Lexer) NextToken() tokens.Token {
 	l.skipWhitespace()
 
-	tok := l.parseNextToken()
+	tok := l.scanNextToken()
 	return tok
 }
 
-func (l *Lexer) parseNextToken() tokens.Token {
+func (l *Lexer) scanNextToken() tokens.Token {
 	var tok tokens.Token
 
 	switch l.char {
@@ -54,6 +54,11 @@ func (l *Lexer) parseNextToken() tokens.Token {
 	case 0:
 		tok = tokens.NewToken(tokens.EOF, "")
 	default:
+		if l.char == '"' {
+			// Scan a string
+			tok = tokens.NewToken(tokens.STRING, l.scanString())
+			break
+		}
 		tok = tokens.NewToken(tokens.ILLEGAL, string(l.char))
 	}
 

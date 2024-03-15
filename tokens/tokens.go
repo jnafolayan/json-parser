@@ -17,4 +17,14 @@ const (
 
 	LBRACE = "{"
 	RBRACE = "}"
+	DQUOTE = "\""
+	SQUOTE = "'"
+	COLON  = ":"
+
+	NUMBER = "NUMBER"
+	STRING = "STRING"
+
+	TRUE  = "TRUE"
+	FALSE = "FALSE"
+	NULL  = "NULL"
 )

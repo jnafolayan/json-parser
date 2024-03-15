@@ -44,9 +44,15 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 	obj := &elements.Object{}
 
 	p.nextToken()
+	// objectPairs, err := p.parseObjectPair()
+
 	if p.currentToken.Type == tokens.RBRACE {
 		return obj, nil
 	}
 
 	return nil, fmt.Errorf("expected %q, found %q", tokens.LBRACE, p.currentToken.Literal)
+}
+
+func (p *Parser) parseObjectPair() ([]*elements.ObjectPair, error) {
+
 }

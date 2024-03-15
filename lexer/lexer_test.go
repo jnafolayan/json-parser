@@ -7,7 +7,8 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := "{}}"
+	input := `{}}
+			"hello"`
 	expected := []struct {
 		expType    tokens.TokenType
 		expLiteral string
@@ -15,6 +16,7 @@ func TestNextToken(t *testing.T) {
 		{tokens.LBRACE, "{"},
 		{tokens.RBRACE, "}"},
 		{tokens.RBRACE, "}"},
+		{tokens.STRING, "hello"},
 		{tokens.EOF, ""},
 	}
 
