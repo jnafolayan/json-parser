@@ -21,9 +21,9 @@ func NewParser(l *lexer.Lexer) *Parser {
 
 // Parse returns `true` is the JSON is valid and `false` otherwise.
 // Parses the grammar found at https://www.json.org/json-en.html
-func (p *Parser) Parse() bool {
+func (p *Parser) Parse() error {
 	_, err := p.parseElement()
-	return err == nil
+	return err
 }
 
 func (p *Parser) nextToken() tokens.Token {
