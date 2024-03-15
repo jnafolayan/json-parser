@@ -8,7 +8,9 @@ import (
 
 func TestNextToken(t *testing.T) {
 	input := `{}}
-			"hello"`
+			"hello"
+			true false null
+			0 01 10 1.1 1e4 1.2e5 1.2e-5 1.2e`
 	expected := []struct {
 		expType    tokens.TokenType
 		expLiteral string
@@ -17,6 +19,17 @@ func TestNextToken(t *testing.T) {
 		{tokens.RBRACE, "}"},
 		{tokens.RBRACE, "}"},
 		{tokens.STRING, "hello"},
+		{tokens.TRUE, "true"},
+		{tokens.FALSE, "false"},
+		{tokens.NULL, "null"},
+		{tokens.NUMBER, "0"},
+		{tokens.ILLEGAL, "01"},
+		{tokens.NUMBER, "10"},
+		{tokens.NUMBER, "1.1"},
+		{tokens.NUMBER, "1e4"},
+		{tokens.NUMBER, "1.2e5"},
+		{tokens.NUMBER, "1.2e-5"},
+		{tokens.ILLEGAL, "1.2e"},
 		{tokens.EOF, ""},
 	}
 

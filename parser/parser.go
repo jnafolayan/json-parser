@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jnafolayan/json-parser/elements"
@@ -23,6 +24,9 @@ func NewParser(l *lexer.Lexer) *Parser {
 // Parses the grammar found at https://www.json.org/json-en.html
 func (p *Parser) Parse() error {
 	_, err := p.parseElement()
+	if !p.lexer.Done() {
+		return errors.New("dangling elements found")
+	}
 	return err
 }
 

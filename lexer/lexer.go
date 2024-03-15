@@ -43,6 +43,10 @@ func (l *Lexer) NextToken() tokens.Token {
 	return tok
 }
 
+func (l *Lexer) Done() bool {
+	return l.char == 0
+}
+
 func (l *Lexer) scanNextToken() tokens.Token {
 	var tok tokens.Token
 
@@ -64,6 +68,14 @@ func (l *Lexer) scanNextToken() tokens.Token {
 		if isLetter(l.char) {
 			tok.Literal = l.scanKeyword()
 			tok.Type = tokens.LookupKeyword(tok.Literal)
+		} else if isDigit(l.char) {
+			num, err := l.scanNumber()
+			if err != nil {
+				tok = tokens.NewToken(tokens.ILLEGAL, num)
+			} else {
+				tok.Type = tokens.NUMBER
+				tok.Literal = num
+			}
 		} else {
 			tok = tokens.NewToken(tokens.ILLEGAL, string(l.char))
 		}
@@ -87,6 +99,10 @@ func isWhitespace(b byte) bool {
 
 func isLetter(ch byte) bool {
 	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'
+}
+
+func isDigit(ch byte) bool {
+	return ch >= '0' && ch <= '9'
 }
 
 // scanNextLine scans the next line from the source. Returns false if an error occured,
