@@ -40,7 +40,7 @@ func main() {
 		fmt.Println("JSON is valid")
 		os.Exit(0)
 	} else {
-		fmt.Fprintf(os.Stderr, "JSON is invalid: %s", parseErr)
+		fmt.Fprintf(os.Stderr, "JSON is invalid: %s\n", parseErr)
 		os.Exit(1)
 	}
 }

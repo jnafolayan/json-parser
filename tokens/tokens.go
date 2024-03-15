@@ -20,6 +20,7 @@ const (
 	DQUOTE = "\""
 	SQUOTE = "'"
 	COLON  = ":"
+	COMMA  = ","
 
 	NUMBER = "NUMBER"
 	STRING = "STRING"

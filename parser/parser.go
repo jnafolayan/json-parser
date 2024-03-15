@@ -44,15 +44,32 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 	obj := &elements.Object{}
 
 	p.nextToken()
-	// objectPairs, err := p.parseObjectPair()
+	for p.currentToken.Type == tokens.STRING {
+		key := p.currentToken
+		p.nextToken()
+		if p.currentToken.Type != tokens.COLON {
+			return nil, fmt.Errorf("expected %q, got %q", tokens.COLON, p.currentToken.Literal)
+		}
+
+		p.nextToken()
+		element, err := p.parseElement()
+		if err != nil {
+			return nil, err
+		}
+
+		obj.Pairs = append(obj.Pairs, &elements.ObjectPair{
+			Key:   key,
+			Value: element,
+		})
+
+		if p.currentToken.Type == tokens.COMMA {
+			p.nextToken()
+		}
+	}
 
 	if p.currentToken.Type == tokens.RBRACE {
 		return obj, nil
 	}
 
 	return nil, fmt.Errorf("expected %q, found %q", tokens.LBRACE, p.currentToken.Literal)
-}
-
-func (p *Parser) parseObjectPair() ([]*elements.ObjectPair, error) {
-
 }
