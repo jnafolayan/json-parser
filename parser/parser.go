@@ -10,6 +10,7 @@ import (
 	"github.com/jnafolayan/json-parser/elements"
 	"github.com/jnafolayan/json-parser/lexer"
 	"github.com/jnafolayan/json-parser/tokens"
+	"github.com/jnafolayan/json-parser/validations"
 )
 
 type Parser struct {
@@ -27,7 +28,8 @@ func NewParser(l *lexer.Lexer) *Parser {
 // Parses the grammar found at https://www.json.org/json-en.html
 func (p *Parser) Parse() error {
 	_, err := p.parseElement()
-	if err == nil && !p.lexer.Done() {
+	p.nextToken()
+	if err == nil && p.currentToken.Type != tokens.EOF {
 		return errors.New("dangling elements found")
 	}
 	return err
@@ -95,11 +97,11 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 		return nil, errors.New("no trailing comma allowed")
 	}
 
-	if p.currentToken.Type == tokens.RBRACE {
-		return obj, nil
+	if p.currentToken.Type != tokens.RBRACE {
+		return nil, fmt.Errorf("expected %q, found %q", tokens.RBRACE, p.currentToken.Literal)
 	}
 
-	return nil, fmt.Errorf("expected %q, found %q", tokens.RBRACE, p.currentToken.Literal)
+	return obj, nil
 }
 
 func (p *Parser) parseArray() (*elements.Array, error) {
@@ -136,6 +138,10 @@ func (p *Parser) parseArray() (*elements.Array, error) {
 }
 
 func (p *Parser) parseString() (*elements.String, error) {
+	err := validations.ValidateString(p.currentToken.Literal)
+	if err != nil {
+		return nil, err
+	}
 	return &elements.String{Value: p.currentToken}, nil
 }
 

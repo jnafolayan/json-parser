@@ -23,6 +23,7 @@ const (
 	SQUOTE   = "'"
 	COLON    = ":"
 	COMMA    = ","
+	MINUS    = "-"
 
 	NUMBER = "NUMBER"
 	STRING = "STRING"

@@ -18,6 +18,18 @@ func main() {
 
 	filename := flag.Arg(0)
 
+	// str := "\t\n"
+	// for _, ru := range str {
+	// 	if !isValidEscapeSequence(ru) {
+	// 		fmt.Printf("illegal escape sequence: %x\n", string(ru))
+	// 		break
+	// 	}
+	// 	if unicode.IsControl(ru) {
+	// 		fmt.Printf("unescaped control character: %x\n", ru)
+	// 	}
+
+	// }
+
 	if filename == "" && *raw == "" {
 		fmt.Fprint(os.Stderr, "You must supply either a raw json string or file")
 		return
@@ -44,3 +56,12 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+// func isValidEscapeSequence(r rune) bool {
+// 	switch r {
+// 	case '\b', '\f', '\n', '\r', '\t':
+// 		return true
+// 	default:
+// 		return false
+// 	}
+// }

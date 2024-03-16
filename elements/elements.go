@@ -5,7 +5,6 @@ import "github.com/jnafolayan/json-parser/tokens"
 type Element interface {
 	element()
 }
-
 type String struct {
 	Value tokens.Token
 }
@@ -29,12 +28,12 @@ type Object struct {
 	Pairs []*ObjectPair
 }
 
+func (o *Object) element() {}
+
 type ObjectPair struct {
 	Key   tokens.Token
 	Value Element
 }
-
-func (o *Object) element() {}
 
 type Array struct {
 	Elements []Element

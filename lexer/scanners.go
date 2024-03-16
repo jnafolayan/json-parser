@@ -1,10 +1,8 @@
 package lexer
 
 import (
-	"bytes"
 	"errors"
 	"strings"
-	"unicode"
 )
 
 func (l *Lexer) scanString() string {
@@ -15,17 +13,8 @@ func (l *Lexer) scanString() string {
 	var res strings.Builder
 	var prevChar byte
 
-	escapeSeq := []byte{'"', '\\', '/', 'b', 'f', 'n', 'r', 't'}
-
 	for l.char != 0 {
 		if l.char == '"' && prevChar != '\\' {
-			break
-		}
-		if prevChar == '\\' && bytes.IndexByte(escapeSeq, l.char) == -1 {
-			// Stop scanning invalid escape sequences
-			break
-		}
-		if unicode.IsControl(rune(l.char)) {
 			break
 		}
 
@@ -77,7 +66,7 @@ func (l *Lexer) scanNumber() (string, error) {
 	num := number.String()
 	if len(num) > 1 {
 		// Is it a valid number?
-		if num[0] == '0' {
+		if num[0] == '0' && num[1] != '.' {
 			return num, errors.New("invalid number")
 		}
 	}

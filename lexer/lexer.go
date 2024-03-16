@@ -9,10 +9,11 @@ import (
 )
 
 type Lexer struct {
-	cursor     int
-	char       byte
-	scanner    *bufio.Scanner
-	lineBuffer string
+	cursor        int
+	char          byte
+	scanner       *bufio.Scanner
+	chunkBuffer   string
+	linesPerChunk int
 }
 
 func NewLexer(r io.Reader) *Lexer {
@@ -20,11 +21,12 @@ func NewLexer(r io.Reader) *Lexer {
 	s.Split(bufio.ScanLines)
 
 	l := &Lexer{
-		cursor:  0,
-		scanner: s,
+		cursor:        0,
+		scanner:       s,
+		linesPerChunk: 1,
 	}
 
-	// Read the first character
+	// Read the first characters
 	l.readCharacter()
 
 	return l
@@ -41,10 +43,6 @@ func (l *Lexer) NextToken() tokens.Token {
 
 	tok := l.scanNextToken()
 	return tok
-}
-
-func (l *Lexer) Done() bool {
-	return l.char == 0
 }
 
 func (l *Lexer) scanNextToken() tokens.Token {
@@ -75,8 +73,16 @@ func (l *Lexer) scanNextToken() tokens.Token {
 			// Return to prevent a readCharacter() call since scanKeyword() stops
 			// at the following character
 			return tok
-		} else if isDigit(l.char) {
+		} else if isDigit(l.char) || (l.char == '-' && isDigit(l.peekCharacter())) {
+			uMinus := false
+			if l.char == '-' {
+				uMinus = true
+				l.readCharacter()
+			}
 			num, err := l.scanNumber()
+			if uMinus && num != "" {
+				num = "-" + num
+			}
 			if err != nil {
 				tok = tokens.NewToken(tokens.ILLEGAL, num)
 			} else {
@@ -115,34 +121,52 @@ func isDigit(ch byte) bool {
 	return ch >= '0' && ch <= '9'
 }
 
-// scanNextLine scans the next line from the source. Returns false if an error occured,
+// scanNextChunk scans the next chunk from the source. Returns false if an error occured,
 // including if we're at EOF
-func (l *Lexer) scanNextLine() bool {
+func (l *Lexer) scanNextChunk() bool {
+	if l.chunkBuffer != "" {
+		l.chunkBuffer = "\n"
+	}
+
 	if l.scanner.Scan() {
-		l.lineBuffer = l.scanner.Text()
-		// Reset the cursor
+		l.chunkBuffer += l.scanner.Text()
 		l.cursor = 0
 		return true
 	}
+
 	return false
 }
 
 func (l *Lexer) shouldScanNextLine() bool {
-	return len(l.lineBuffer) == 0 || l.cursor >= len(l.lineBuffer)
+	return len(l.chunkBuffer) == 0 || l.cursor >= len(l.chunkBuffer)
 }
 
-// readCharacter is a helper function to scan the next source line if necessary and
+// readCharacter is a helper function to scan the next input chunk if necessary and
 // return the next character in the stream.
 func (l *Lexer) readCharacter() byte {
 	if l.shouldScanNextLine() {
-		couldScan := l.scanNextLine()
+		couldScan := l.scanNextChunk()
 		if !couldScan {
 			l.char = 0
 			return l.char
 		}
 	}
 
-	l.char = l.lineBuffer[l.cursor]
+	l.char = l.chunkBuffer[l.cursor]
 	l.cursor += 1
 	return l.char
+}
+
+func (l *Lexer) peekCharacter() byte {
+	if l.shouldScanNextLine() {
+		prev := l.chunkBuffer
+		l.scanNextChunk()
+		l.chunkBuffer = prev + l.chunkBuffer
+	}
+
+	if l.cursor+1 < len(l.chunkBuffer) {
+		return l.chunkBuffer[l.cursor+1]
+	}
+
+	return 0
 }

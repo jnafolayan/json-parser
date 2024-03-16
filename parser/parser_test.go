@@ -33,8 +33,9 @@ func TestParseJSONObject1(t *testing.T) {
 	}`
 	l := lexer.FromString(input)
 	p := NewParser(l)
-	if p.Parse() != nil {
-		t.Fatalf("expected json to be valid")
+	s := p.Parse()
+	if s != nil {
+		t.Fatalf("expected json to be valid: %s", s)
 	}
 }
 
