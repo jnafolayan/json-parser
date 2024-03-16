@@ -91,7 +91,7 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 		return obj, nil
 	}
 
-	return nil, fmt.Errorf("expected %q, found %q", tokens.LBRACE, p.currentToken.Literal)
+	return nil, fmt.Errorf("expected %q, found %q", tokens.RBRACE, p.currentToken.Literal)
 }
 
 func (p *Parser) parseArray() (*elements.Array, error) {
