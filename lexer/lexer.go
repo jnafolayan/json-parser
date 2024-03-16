@@ -61,6 +61,10 @@ func (l *Lexer) scanNextToken() tokens.Token {
 		tok = tokens.NewToken(tokens.COLON, string(l.char))
 	case ',':
 		tok = tokens.NewToken(tokens.COMMA, string(l.char))
+	case '/':
+		tok = tokens.NewToken(tokens.SOLIDUS, string(l.char))
+	case '\\':
+		tok = tokens.NewToken(tokens.RSOLIDUS, string(l.char))
 	case 0:
 		tok = tokens.NewToken(tokens.EOF, "")
 	case '"':

@@ -20,6 +20,8 @@ const (
 	LBRACKET = "["
 	RBRACKET = "]"
 	DQUOTE   = "\""
+	SOLIDUS  = "/"
+	RSOLIDUS = "\\"
 	SQUOTE   = "'"
 	COLON    = ":"
 	COMMA    = ","
