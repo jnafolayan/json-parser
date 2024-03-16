@@ -9,10 +9,12 @@ import (
 )
 
 type Lexer struct {
-	cursor        int
-	char          byte
-	scanner       *bufio.Scanner
-	chunkBuffer   string
+	// cursor is 1 ahead of the current scanned character
+	cursor      int
+	char        byte
+	scanner     *bufio.Scanner
+	chunkBuffer string
+	// number of lines to read into the buffer
 	linesPerChunk int
 }
 
@@ -23,10 +25,10 @@ func NewLexer(r io.Reader) *Lexer {
 	l := &Lexer{
 		cursor:        0,
 		scanner:       s,
-		linesPerChunk: 1,
+		linesPerChunk: 5,
 	}
 
-	// Read the first characters
+	// Read the first character
 	l.readCharacter()
 
 	return l
@@ -128,17 +130,18 @@ func isDigit(ch byte) bool {
 // scanNextChunk scans the next chunk from the source. Returns false if an error occured,
 // including if we're at EOF
 func (l *Lexer) scanNextChunk() bool {
-	if l.chunkBuffer != "" {
-		l.chunkBuffer = "\n"
-	}
-
-	if l.scanner.Scan() {
+	l.chunkBuffer = ""
+	firstScan := true
+	for l.scanner.Scan() {
+		if !firstScan {
+			l.chunkBuffer += "\n"
+		}
+		firstScan = false
 		l.chunkBuffer += l.scanner.Text()
-		l.cursor = 0
-		return true
 	}
 
-	return false
+	l.cursor = 0
+	return l.chunkBuffer != ""
 }
 
 func (l *Lexer) shouldScanNextLine() bool {
@@ -164,12 +167,16 @@ func (l *Lexer) readCharacter() byte {
 func (l *Lexer) peekCharacter() byte {
 	if l.shouldScanNextLine() {
 		prev := l.chunkBuffer
+		cursor := l.cursor
 		l.scanNextChunk()
+		// Restore any past or unused state
 		l.chunkBuffer = prev + l.chunkBuffer
+		l.cursor = cursor
 	}
 
-	if l.cursor+1 < len(l.chunkBuffer) {
-		return l.chunkBuffer[l.cursor+1]
+	if l.cursor < len(l.chunkBuffer) {
+		// Remember cursor is a lookahead
+		return l.chunkBuffer[l.cursor]
 	}
 
 	return 0
