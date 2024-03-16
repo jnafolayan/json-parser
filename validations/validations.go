@@ -35,7 +35,7 @@ func isValidHexString(str string, start, end int) bool {
 	var ch byte
 	for i := start; i < end; i++ {
 		ch = str[i]
-		if !(ch >= '0' && ch <= '9') && !(ch >= 'a' && ch <= 'z') && !(ch >= 'A' && ch <= 'Z') {
+		if !(ch >= '0' && ch <= '9') && !(ch >= 'a' && ch <= 'f') && !(ch >= 'A' && ch <= 'F') {
 			return false
 		}
 	}
