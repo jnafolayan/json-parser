@@ -35,6 +35,27 @@ func (p *Parser) Parse() error {
 	return err
 }
 
+// RestrictedParse is similar to Parse, except a valid JSON text is
+// a serialized object or array.
+// https://www.ietf.org/rfc/rfc4627.txt
+func (p *Parser) RestrictedParse() error {
+	ele, err := p.parseElement()
+	if err != nil {
+		return err
+	}
+
+	p.nextToken()
+	if p.currentToken.Type != tokens.EOF {
+		return errors.New("dangling elements found")
+	}
+
+	if ele.ElementType() != elements.OBJECT || ele.ElementType() != elements.ARRAY {
+		return errors.New("JSON text must be a serialized object or array")
+	}
+
+	return nil
+}
+
 func (p *Parser) nextToken() tokens.Token {
 	p.currentToken = p.lexer.NextToken()
 	return p.currentToken
@@ -50,11 +71,7 @@ func (p *Parser) parseElement() (elements.Element, error) {
 		return p.parseString()
 	case tokens.NUMBER:
 		return p.parseNumber()
-	case tokens.TRUE:
-		fallthrough
-	case tokens.FALSE:
-		fallthrough
-	case tokens.NULL:
+	case tokens.TRUE, tokens.FALSE, tokens.NULL:
 		return p.parseKeyword()
 	default:
 		return nil, fmt.Errorf("illegal token %q", p.currentToken.Literal)
