@@ -63,7 +63,10 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 	obj := &elements.Object{}
 
 	p.nextToken()
+	lastTokenWasComma := false
 	for p.currentToken.Type == tokens.STRING {
+		lastTokenWasComma = false
+
 		key := p.currentToken
 		p.nextToken()
 		if p.currentToken.Type != tokens.COLON {
@@ -84,7 +87,12 @@ func (p *Parser) parseObject() (*elements.Object, error) {
 		p.nextToken()
 		if p.currentToken.Type == tokens.COMMA {
 			p.nextToken()
+			lastTokenWasComma = true
 		}
+	}
+
+	if lastTokenWasComma {
+		return nil, errors.New("no trailing comma allowed")
 	}
 
 	if p.currentToken.Type == tokens.RBRACE {
@@ -98,7 +106,10 @@ func (p *Parser) parseArray() (*elements.Array, error) {
 	arr := &elements.Array{}
 
 	p.nextToken()
+	lastTokenWasComma := false
 	for p.currentToken.Type != tokens.RBRACKET && p.currentToken.Type != tokens.EOF {
+		lastTokenWasComma = false
+
 		element, err := p.parseElement()
 		if err != nil {
 			return nil, err
@@ -106,11 +117,15 @@ func (p *Parser) parseArray() (*elements.Array, error) {
 
 		arr.Elements = append(arr.Elements, element)
 		p.nextToken()
-		fmt.Println(p.currentToken)
 
 		if p.currentToken.Type == tokens.COMMA {
 			p.nextToken()
+			lastTokenWasComma = true
 		}
+	}
+
+	if lastTokenWasComma {
+		return nil, errors.New("no trailing comma allowed")
 	}
 
 	if p.currentToken.Type != tokens.RBRACKET {
