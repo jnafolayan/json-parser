@@ -11,15 +11,20 @@ func (l *Lexer) scanString() string {
 
 	// Iterate until we hit a closing quote or EOF
 	var res strings.Builder
-	var prevChar byte
+	escaped := false
 
 	for l.char != 0 {
-		if l.char == '"' && prevChar != '\\' {
+		if l.char == '"' && !escaped {
 			break
 		}
 
+		if l.char == '\\' && !escaped {
+			escaped = true
+		} else {
+			escaped = false
+		}
+
 		res.WriteByte(l.char)
-		prevChar = l.char
 		l.readCharacter()
 	}
 

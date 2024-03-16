@@ -49,7 +49,7 @@ func (p *Parser) RestrictedParse() error {
 		return errors.New("dangling elements found")
 	}
 
-	if ele.ElementType() != elements.OBJECT || ele.ElementType() != elements.ARRAY {
+	if ele.ElementType() != elements.OBJECT && ele.ElementType() != elements.ARRAY {
 		return errors.New("JSON text must be a serialized object or array")
 	}
 
