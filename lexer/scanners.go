@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"strings"
+	"unicode"
 )
 
 func (l *Lexer) scanString() string {
@@ -14,16 +15,20 @@ func (l *Lexer) scanString() string {
 	var res strings.Builder
 	var prevChar byte
 
-	specialChars := []byte{'"', '\\', '/', 'b', 'f', 'n', 'r', 't'}
+	escapeSeq := []byte{'"', '\\', '/', 'b', 'f', 'n', 'r', 't'}
 
 	for l.char != 0 {
 		if l.char == '"' && prevChar != '\\' {
 			break
 		}
-		if prevChar == '\\' && bytes.IndexByte(specialChars, l.char) == -1 {
-			// Only bytes in `specialChars` are allowed to follow a backslash
+		if prevChar == '\\' && bytes.IndexByte(escapeSeq, l.char) == -1 {
+			// Stop scanning invalid escape sequences
 			break
 		}
+		if unicode.IsControl(rune(l.char)) {
+			break
+		}
+
 		res.WriteByte(l.char)
 		prevChar = l.char
 		l.readCharacter()
