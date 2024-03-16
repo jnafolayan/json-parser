@@ -5,6 +5,7 @@ The major objective of this tool was to parse a JSON text without loading all of
 Clone the repo
 ```bash
 git clone github.com/jnafolayan/json-parser
+cd json-parser
 ```
 
 Build the jp cli
