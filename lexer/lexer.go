@@ -20,12 +20,12 @@ type Lexer struct {
 
 func NewLexer(r io.Reader) *Lexer {
 	s := bufio.NewScanner(r)
-	s.Split(bufio.ScanLines)
+	s.Split(bufio.ScanRunes)
 
 	l := &Lexer{
 		cursor:        0,
 		scanner:       s,
-		linesPerChunk: 5,
+		linesPerChunk: 50,
 	}
 
 	// Read the first character
@@ -131,12 +131,7 @@ func isDigit(ch byte) bool {
 // including if we're at EOF
 func (l *Lexer) scanNextChunk() bool {
 	l.chunkBuffer = ""
-	firstScan := true
 	for l.scanner.Scan() {
-		if !firstScan {
-			l.chunkBuffer += "\n"
-		}
-		firstScan = false
 		l.chunkBuffer += l.scanner.Text()
 	}
 

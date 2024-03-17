@@ -12,7 +12,7 @@ func ValidateString(str string) error {
 		if str[i] == '\\' {
 			i++
 			if i < len(str) {
-				if str[i] == 'u' && isValidHexString(str, i+1, i+5) {
+				if str[i] == 'u' && i+5 <= len(str) && isValidHexString(str, i+1, i+5) {
 					i += 4
 					continue
 				}
